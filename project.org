@@ -1,0 +1,133 @@
+#+TITLE: Project
+
+Get our data
+#+NAME: import
+#+begin_src python :session Python :noweb yes :exports both
+import covid_daily
+
+covid_daily.constants.AVAILABLE_CHARTS
+
+#+end_src
+
+#+RESULTS: import
+| total-currently-infected-linear | deaths-cured-outcome-small | coronavirus-cases-linear | graph-cases-daily | graph-active-cases-total | coronavirus-deaths-linear | graph-deaths-daily | cases-cured-daily | deaths-cured-outcome |
+
+#+RESULTS:
+
+#+NAME: data
+#+begin_src python :session Python :noweb yes :exports both
+<<import>>
+overview = covid_daily.data(country="Czech Republic", chart="graph-cases-daily")
+#overview['2022-01-03']
+cs = "Novel Coronavirus Daily Cases"
+data = overview[cs]
+#+end_src
+
+#+RESULTS: data
+
+
+#+NAME: model
+#+begin_src python :session Python :noweb yes :exports both
+<<import>>
+<<view>>
+<<data>>
+from sklearn.metrics import r2_score
+import numpy
+
+now = len(data)
+cleanCount = 0
+y = []
+for yy in data:
+    if  (yy >= 0):
+        cleanCount+=1
+        y.append(yy)
+x = []
+xn = []
+focus = 3
+for xx in range(0,cleanCount):
+    if(xx>=focus):
+        y2, y1 = y[xx-1], y[xx-focus]
+        m = (y2-y1)/((xx-1) - (xx-focus))
+        x.append(m)
+    else:
+        x.append(xx)
+    xn.append(xx)
+
+model = numpy.poly1d(numpy.polyfit(x,y,30))
+#+end_src
+
+#+RESULTS: model
+
+#+NAME: model R2
+#+begin_src python :session Python :noweb yes :exports both
+<<model>>
+r2_score(y, model(x))
+#+end_src
+
+#+RESULTS: model R2
+: 0.638229485144135
+Could be better, could be worse
+
+#+NAME: visual model
+#+begin_src python :session Python :noweb yes :exports both :results graphics file :file plot1.png
+<<model>>
+import matplotlib.pyplot as plt
+
+plt.scatter(x,y)
+line = numpy.linspace(min(x),max(x))
+plt.plot(line, model(line))
+plt.savefig("plot1")
+#+end_src
+
+#+RESULTS: visual model
+[[file:plot1.png]]
+
+#+NAME: prediction
+#+begin_src python :session Python :noweb yes :exports both
+<<model>>
+import pandas as pd
+xx = len(y)-2
+yc = y.copy()
+o = []
+predRange = 10
+for i in range(predRange):
+    y2, y1 = yc[xx-1], yc[xx-focus]
+    m = (y2-y1)/((xx-1) - (xx-focus))
+    p = model(m)
+    print(m, p)
+    yc.append(p)
+    o.append(p)
+    xx += 1
+pd.DataFrame({"prediction": o})
+#+end_src
+
+#+RESULTS: prediction
+#+begin_example
+     prediction
+0  11555.557756
+1   6425.472649
+2   5574.871914
+3  12215.826713
+4    724.174248
+5   6010.193574
+6   9862.363097
+7   5604.246656
+8   6468.590557
+9  11272.823696
+#+end_example
+
+#+NAME: plot prediction
+#+begin_src python :session Python :noweb yes :exports both :file plot2.png :results graphics file
+<<prediction>>
+<<model>>
+<<data>>
+import matplotlib.pyplot as plt2
+
+plt2.scatter(xn[-80:-1], y[-80:-1])
+plt2.scatter(range(len(x), len(x)+len(o)), o)
+plt2.savefig("plot2")
+
+#+end_src
+
+#+RESULTS: plot prediction
+[[file:plot2.png]]
