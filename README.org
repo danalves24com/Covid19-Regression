@@ -3,5 +3,7 @@
 * Covid19 Regression
 A set of notebooks studying relationships in Covid-19.
 * Notebooks
-** First
-[[]]
+** General Covid n-day ROC model
+[[./project.org]]
+** Spain(Omicron) model application in Czech Republic
+[[./omicron/spnishModelInCzechia.org]]
