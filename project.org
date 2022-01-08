@@ -1,6 +1,6 @@
 #+TITLE: Project
 
-Get our data
+* Data
 #+NAME: import
 #+begin_src python :session Python :noweb yes :exports both
 import covid_daily
@@ -13,7 +13,7 @@ covid_daily.constants.AVAILABLE_CHARTS
 | total-currently-infected-linear | deaths-cured-outcome-small | coronavirus-cases-linear | graph-cases-daily | graph-active-cases-total | coronavirus-deaths-linear | graph-deaths-daily | cases-cured-daily | deaths-cured-outcome |
 
 #+RESULTS:
-
+** Clean Data
 #+NAME: data
 #+begin_src python :session Python :noweb yes :exports both
 <<import>>
@@ -25,7 +25,7 @@ data = overview[cs]
 
 #+RESULTS: data
 
-
+* Model
 #+NAME: model
 #+begin_src python :session Python :noweb yes :exports both
 <<import>>
@@ -57,7 +57,7 @@ model = numpy.poly1d(numpy.polyfit(x,y,30))
 #+end_src
 
 #+RESULTS: model
-
+** Model Correlation
 #+NAME: model R2
 #+begin_src python :session Python :noweb yes :exports both
 <<model>>
@@ -67,7 +67,7 @@ r2_score(y, model(x))
 #+RESULTS: model R2
 : 0.638229485144135
 Could be better, could be worse
-
+** Visualuze model
 #+NAME: visual model
 #+begin_src python :session Python :noweb yes :exports both :results graphics file :file plot1.png
 <<model>>
@@ -81,7 +81,7 @@ plt.savefig("plot1")
 
 #+RESULTS: visual model
 [[file:plot1.png]]
-
+* Predictions
 #+NAME: prediction
 #+begin_src python :session Python :noweb yes :exports both
 <<model>>
@@ -115,7 +115,7 @@ pd.DataFrame({"prediction": o})
 8   6468.590557
 9  11272.823696
 #+end_example
-
+** Predictions graph
 #+NAME: plot prediction
 #+begin_src python :session Python :noweb yes :exports both :file plot2.png :results graphics file
 <<prediction>>
