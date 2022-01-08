@@ -1,0 +1,80 @@
+#+TITLE: Spanish Model In Czechia
+
+#+NAME: model
+#+begin_src python :session Python :noweb yes :exports both
+c = [-1.29230831e-32, -3.47651773e-31, -9.22811514e-30, -2.45114686e-28,
+       -6.25677347e-27, -1.58501896e-25, -3.51423546e-24, -7.28443198e-23,
+       -5.42580958e-22,  2.13673832e-20,  2.71521748e-18,  1.07590713e-16,
+        5.03755624e-15,  1.15553600e-13,  3.75978278e-12, -2.62796806e-11,
+       -5.03384283e-10, -1.44009066e-07,  1.89330804e-06,  4.19069968e-05,
+       -8.10543194e-04,  6.27368214e-04,  5.64789797e-02, -2.22022330e-01,
+       -1.30082635e+00,  6.99267333e+00,  6.83860326e+00, -3.87270791e+01,
+        6.80573147e+01, -7.52852659e+02, -5.37179779e+02,  7.83163922e+03,
+        1.00549250e+03,  4.58826317e+03]
+def model(x):
+    p = len(c)-1
+    print(p)
+    sm = 0
+    for cc in c:
+        sm+= cc * pow(x, p)
+        p-=1
+    return sm
+model(2)
+#+end_src
+
+#+RESULTS: model
+: 23166.454731034944
+
+** Omicron Model Application
+#+NAME: czData
+#+begin_src python :session Python :noweb yes :exports both
+overview = covid_daily.data(country="Czech Republic", chart="graph-cases-daily")
+#overview['2022-01-03']
+<<model>>
+cs = "Novel Coronavirus Daily Cases"
+dataCZ = overview[ccs]
+
+now = len(dataCZ)
+cleanCount = 0
+y = []
+for yy in dataCZ:
+    if  (yy >= 0):
+        cleanCount+=1
+        y.append(yy)
+x = []
+xn = []
+xx = len(y)-5
+focus = 5
+for xx in range(0,cleanCount):
+    if(xx>=focus):
+        y2, y1 = y[xx-1], y[xx-focus]
+        m = (y2-y1)/((xx-1) - (xx-focus))
+        m/=1000
+        x.append(m)
+    else:
+        x.append(xx)
+    xn.append(xx)
+yc = y.copy()
+o = []
+predrange = 23
+for i in range(predrange):
+    y2, y1 = yc[xx-1], yc[xx-focus]
+    m = (y2-y1)/((xx-1) - (xx-focus))
+    m/=1000
+    p = model(m)
+    print(m, p)
+    yc.append(p)
+    o.append(p)
+    xx += 1
+pd.DataFrame({"prediction": o})
+plt.cla()
+backFactor = 9
+print(y[-1])
+plt.scatter(xn[-10*backFactor:-1], y[-10*backFactor:-1])
+plt.scatter(range(len(x), len(x)+len(o)), o)
+plt.savefig("plot2")
+plt.cla()
+#+end_src
+
+#+RESULTS: czData
+: None

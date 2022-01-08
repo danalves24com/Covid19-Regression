@@ -1,0 +1,7 @@
+#+TITLE: README
+
+* Covid19 Regression
+A set of notebooks studying relationships in Covid-19.
+* Notebooks
+** First
+[[]]
